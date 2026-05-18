@@ -7,7 +7,6 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<Header></Header>
 <div class="bg-gray-950 h-screen">
 	{@render children()}
 </div>

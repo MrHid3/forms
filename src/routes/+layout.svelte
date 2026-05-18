@@ -7,7 +7,14 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<div class="bg-gray-950 h-screen">
+<div class="
+	bg-radial  from-cyan-950 to-gray-950
+<!--	bg-gray-950-->
+	h-screen
+"
+style="background-position: 0% -20%;
+background-size: 100% 150%"
+>
 	{@render children()}
 </div>
 

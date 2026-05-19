@@ -4,7 +4,7 @@
 
 	const routes = [
 		{ name: 'Home', path: '/' },
-		{ name: 'Auth', path: '/auth' },
+		{ name: 'Auth', path: '/auth' }
 	];
 </script>
 

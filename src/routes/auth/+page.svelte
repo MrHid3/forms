@@ -1,9 +1,12 @@
 <script lang="ts">
 
-    import { resolve } from '$app/paths';
+    import {resolve} from '$app/paths';
 
     let showPassword = $state(false);
     let password = $state("");
+
+    const usernameRegex = "[a-z0-9]{3,50}";
+
 </script>
 
 <div class="
@@ -12,117 +15,146 @@
     ">
     <div class="container
     bg-gray-900
-    h-100 w-100
+    h-90 w-100
     rounded-md
     relative
     overflow-hidden
         ">
         <div class="
         group
-        bg-gray-500
         h-9
         flex flex-row justify-evenly
         rounded-t-md
-<!--        border-b-2 border-b-gray-400-->
-        before:bg-radial  before:from-gray-300 before:via-blue-500 before:to-gray-300 before:from-20% before:via-50% before:to-85%
-        before:h-100 before:w-200
-        before:absolute
         relative
-        before:z-0
         z-50
-        before:-left-4/5
-        has-[#login:checked]:before:-left-1/5
-        before:bottom-0
-        before:duration-300
         bg-position-50
         overflow-hidden
+        before:bg-linear-to-r before:from-gray-900  before:via-slate-500 before:to-gray-900 before:from-20% before:to-80%
+        before:h-100 before:w-200
+        before:absolute
+        before:z-0
+        before:-left-4/5
+        has-[#register:hover]:before:-left-4/5
+        has-[#login:checked]:before:-left-1/5
+        has-[#login:hover]:before:-left-1/5
+        before:-top-3
+        before:duration-500 before:ease-out
         ">
-            <input type="radio" class="hidden peer/register" id="register" name="choose-auth" checked>
-            <label for="register" class="menu-button
+            <input checked class="hidden peer/register" id="register" name="choose-auth" type="radio">
+            <label class="menu-button
             not-peer-checked/register:hover:text-gray-50
             rounded-tl-md
             not-peer-checked/register:text-gray-300
-            ">
+            " for="register">
                 REGISTER
             </label>
-            <input type="radio" class="hidden peer/login" id="login" name="choose-auth">
-            <label for="login" class="menu-button
+            <input class="hidden peer/login" id="login" name="choose-auth" type="radio">
+            <label class="menu-button
             rounded-tr-md
             not-peer-checked/login:text-gray-300
              not-peer-checked/login:hover:text-gray-50
-            ">
+            " for="login">
                 LOGIN
             </label>
         </div>
         <div class="form-container
         absolute left-0
-        flex flex-row
-        h-100 w-200
+        flex flex-row justify-evenly
+        h-full w-200
         duration-200
+        z-50
+        py-5
         ">
 
             <div class="register
-                    h-100 w-100
+                    h-full w-100 px-7
                     ">
-                <form action="?/register" method="POST" class="
-                flex flex-col justify-center items-center gap-4
-                p-4
-                ">
-                    <input type="email" name="email" required placeholder="email@example.com" class="
-                input
-                ">
-                    <input type={showPassword ? "text" : "password"} name="password" bind:value={password} required placeholder="very_$afe+Password" class="
-                input
-                ">
-                    <input type={showPassword ? "text" : "password"} pattern={password} required placeholder="rep3at_passw0rd" class="
-                input
-                ">
-                    <label for="show-password" class="
+                <form action="?/register" class="
+                flex flex-col justify-baseline items-center gap-4
+                h-full
+                p-7
+                " method="POST">
+                    <input class="
+                    input
+                    " name="email" placeholder="u$ernam3" required type="text" pattern={usernameRegex} autocomplete="off">
+                    <input bind:value={password} class="
+                    input
+                    " name="password" placeholder="very_$afe+Password" pattern={"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+\\-]).{8,12}$"}
+                           required type={showPassword ? "text" : "password"}>
+                    <input class="
+                    input
+                    " pattern={password} placeholder="rep3at_passw0rd"
+                    required type={showPassword ? "text" : "password"}>
+                    <label class="
                     text-gray-200
-                    ">
-                        Pokaż hasło
-                        <input type="checkbox" id="show-password" bind:checked={showPassword} class="
+                    text-left
+                    w-80
+                    " for="show-password">
+                        Show password
+                        <input bind:checked={showPassword} class="
                         accent-blue-500
                         border-0
-                        bg-gray-950
-                        ">
+                        bg-slate-700
+                        rounded-sm
+                        " id="show-password" type="checkbox">
                     </label>
-                    <button type="submit">Register</button>
+                    <button class="button p-1" type="submit">REGISTER</button>
                 </form>
             </div>
             <div class="login
-                    hidden
-                    ">
-
+            w-100 px-7
+            ">
+                <form action="?/login" method="POST" class="
+                flex flex-col justify-baseline items-center gap-4
+                h-full
+                p-7
+                ">
+                    <input class="
+                    input
+                    " name="email" placeholder="username" required type="text">
+                    <input bind:value={password} class="
+                    input
+                    " name="password" placeholder="password"
+                           required type={showPassword ? "text" : "password"}>
+                    <label class="
+                    text-gray-200
+                    text-left
+                    w-80
+                    " for="show-password">
+                        Show password
+                        <input bind:checked={showPassword} class="
+                        accent-blue-500
+                        border-0
+                        bg-slate-700
+                        rounded-sm
+                        " id="show-password" type="checkbox">
+                    </label>
+                    <button class="button p-1" type="submit">LOGIN</button>
+                </form>
             </div>
         </div>
     </div>
-    <a href={resolve('/')} class="text-gray-50 hover:text-gray-800 text-1xl bg-blue-500 hover:bg-blue-300 duration-300 border-2 border-gray-700 hover:border-blue-300 rounded-md p-3 cursor-pointer">Go back</a>
 </div>
 
 <style>
     @import "tailwindcss";
 
-    /*.container:has(input#login:checked) .login,*/
-    /*.container:has(input#register:checked) .register*/
-    /*{*/
-    /*    display: block !important;*/
-    /*}*/
-
     .container:has(input#login:checked) .form-container {
         @apply -left-full;
     }
 
-    .input
-    {
+    .input {
         @apply
         w-80
-        bg-slate-700
-        border-0
-        rounded-sm;
+            bg-slate-700
+            border-0
+            rounded-sm
+            text-gray-200
+            ring-slate-400
+        ;
     }
 
-    .menu-button{
+    .menu-button {
         @apply
         text-gray-200 font-bold
         duration-150
@@ -132,6 +164,38 @@
         flex items-center justify-center
         text-shadow-black/20 text-shadow-sm
         select-none
+        ;
+    }
+
+    *::before {
+        z-index: -1;
+    }
+
+    .link {
+        @apply
+        text-gray-50 hover:text-white text-xl
+        duration-300
+        border-2 border-gray-50/60 hover:border-gray-50
+        rounded-md
+        cursor-pointer
+        overflow-hidden
+        relative
+        z-10
+        before:bg-linear-to-r before:from-blue-500 before:via-sky-300 before:to-blue-700
+        before:h-full before:w-[200%]
+        before:duration-500 before:ease-in-out
+        before:absolute before:top-0 hover:before:left-0 before:-left-full
+        ;
+    }
+
+    .button {
+        @apply
+        text-gray-200 font-bold text-center hover:text-gray-900
+        border-2 border-gray-200 hover:border-transparent
+        rounded-sm
+        cursor-pointer
+        duration-300
+        hover:bg-gray-50
         ;
     }
 </style>

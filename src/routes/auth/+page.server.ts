@@ -37,10 +37,11 @@ export const actions: Actions = {
 		try{
 			token = res.headers.getSetCookie()[0];
 			token = token.substring(6, token.indexOf(";"))
+			token = decodeURIComponent(token)
 			cookies.set('token', token, {
 				httpOnly: true,
 				secure: false,
-				sameSite: "strict",
+				sameSite: "lax",
 				path: "/",
 				maxAge: 60 * 60 * 24 * 30
 			})

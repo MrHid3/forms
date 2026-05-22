@@ -21,9 +21,9 @@ px-4
 ">
     <p class="
 	text-gray-200 text-center font-bold text-6xl py-5
-	">DASHBOARD</p>
+	">Your forms</p>
     <div class="
-    grid grid-cols-4 gap-4
+    grid grid-cols-4 gap-4 p-10
 	">
         {#each rows as row, index(index)}
             <div class="flex flex-col flex-1 gap-4">

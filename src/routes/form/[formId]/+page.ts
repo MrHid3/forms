@@ -3,11 +3,12 @@ import type {PageLoad} from "../../../../.svelte-kit/types/src/routes/dashboard/
 
 export const load : PageLoad = async (event) => {
 
-    const form = await event.fetch(`${PUBLIC_BACKEND_URL}/form/${event.params.slug}`, {credentials: "include"});
+    let formRequest = await event.fetch(`${PUBLIC_BACKEND_URL}/form/${event.params.formId}`, {credentials: "include"});
+    let form = await formRequest.json();
 
-    if(form.ok){
+    if(formRequest.ok){
         return {
-            form: (await form.json()).form
+            form: form.form
         }
     }
 }

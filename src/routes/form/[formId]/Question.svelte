@@ -1,0 +1,150 @@
+<script lang="ts">
+    import {tick, untrack} from "svelte";
+
+    interface Question {
+        id: number,
+        type: string,
+        order: number,
+        required: boolean,
+        content: string,
+        answers: Answer[] | RangeSettings | null
+    }
+
+    interface RangeSettings {
+        min: number,
+        max: number,
+        step: number
+    }
+
+    interface Answer{
+        id: number,
+        content: string
+    }
+
+    let {question = $bindable(), deleteMe}: { question: Question, deleteMe: () => void} = $props();
+
+    const questionTypes = [
+        {value: "short answer", displayName: "Short answer"},
+        {value: "long answer", displayName: "Long answer"},
+        {value: "single choice", displayName: "Single choice"},
+        {value: "multiple choice", displayName: "Multiple choice"},
+        {value: "range", displayName: "Range"}
+    ]
+
+    const removeChoice = (choiceToRemove : Answer) => {
+        const index = question.answers?.findIndex(e => e == choiceToRemove);
+        question.answers?.splice(index, 1);
+    }
+
+    const addAnswer = async () => {
+        question.answers?.push({id: question.answers?.length + 1, content: ""} as Answer);
+        await tick();
+        const inputs : NodeListOf<HTMLInputElement> = document.querySelectorAll(`input.answerInput-${question.id}`)
+        inputs[inputs.length - 1].focus()
+    }
+
+    $effect(() => {
+        question.type;
+        untrack(() => {
+            if(question.type === "range" && (Array.isArray(question.answers) || question.answers == null)) {
+                question.answers = {min: 1, max: 100, step: 5} as RangeSettings;
+            } else if((question.type === "multiple choice" || question.type === "single choice") && (!Array.isArray(question.answers) || question.answers == null)) {
+                question.answers = [{id: 1, content: "Option 1"} as Answer];
+            }
+        })
+    })
+
+
+</script>
+
+<div class="text-2xl text-gray-200 p-4 flex flex-col relative">
+    <div class="flex flex-row">
+        <input bind:value={question.content} class="input-stealth my-2" placeholder="Question" autocomplete="off">
+        <select bind:value={question.type} class="button" name="questionType" required autocomplete="">
+            {#each questionTypes as type (type.value)}
+                <option value={type.value}>{type.displayName}</option>
+            {/each}
+        </select>
+        <button onclick={deleteMe} class="button p-3 w-20">X</button>
+    </div>
+    <label for={`required-${question.id}`}>
+        <span>Required</span>
+        <input type="checkbox" bind:checked={question.required} id={`required=${question.id}`}>
+    </label>
+    {#if question.type === "short answer" }
+        <span class="italic font-light text-neutral-400">Short answer text</span>
+    {:else if question.type === "long answer"}
+        <span class="italic font-light text-neutral-300">Long answer text</span>
+    {:else if question.type === "single choice" || question.type === "multiple choice"}
+        {@const  inputType= question.type === "single choice" ? "radio" :"checkbox" }
+        <div class="flex flex-col gap-2">
+            {#each question.answers as answer (answer.id)}
+                <div class="flex flex-row w-full justify-between">
+                    <label for="new-choice-{answer}"
+                           class="flex flex-row wrap-normal border-2 border-gray-500 choice-label items-center gap-3 p-1 rounded-xl text-gray-300">
+                        <input type={inputType} disabled
+                               value={answer} id="new-choice-{answer}">
+                        <input type="text" bind:value={answer.content} placeholder={`Option ${answer.id}`} class={`answerInput-${question.id}`} autocomplete="off">
+                    </label>
+                    <button type="button" class="button self-end w-7 h-7" onclick={() => removeChoice(answer)}>X
+                    </button>
+                </div>
+            {/each}
+            <div class="flex flex-row">
+                <input type={inputType} disabled>
+                <input type="text" placeholder="Add option" onclick={() => addAnswer()} autocomplete="off">
+            </div>
+        </div>
+
+    {:else if question.type === "range" && question.answers}
+        <input type="range" min={question.answers?.min} max={question.answers?.max} step={question.answers?.step} disabled>
+        <div class="flex flex-row justify-between">
+            <div class="flex flex-col">
+                Min:
+                <input type="number" bind:value={question.answers.min} class="w-1/2" autocomplete="off">
+            </div>
+            <div class="flex flex-col text-center">
+                Step:
+                <input type="number" bind:value={question.answers.step} class="w-1/2 self-center" autocomplete="off">
+            </div>
+            <div class="flex flex-col text-end">
+                Max:
+                <input type="number" bind:value={question.answers.max} class="w-1/2 self-end" autocomplete="off">
+            </div>
+        </div>
+    {/if}
+</div>
+
+<div class="w-4/5 h-px border-b-gray-400 border-2 mx-auto"></div>
+
+<style>
+    @import "tailwindcss";
+
+    .input-stealth {
+        @apply
+        w-full
+        text-gray-300 focus:text-gray-100
+        border-0 border-b-2  border-b-transparent focus:border-gray-600
+        duration-200
+        focus:ring-0 ring-0 active:ring-0
+        box-border
+        bg-neutral-700/20 focus:bg-neutral-700/40
+        ;
+        transition-property: border-color, color, padding;
+    }
+
+    input[type="radio"] {
+        border-radius: 50%;
+    }
+
+    .button {
+        @apply
+        text-gray-200 font-bold text-center hover:text-gray-900
+        border-2 border-gray-200 hover:border-transparent
+        rounded-sm
+        cursor-pointer
+        duration-300
+        hover:bg-gray-50
+        ;
+    }
+</style>

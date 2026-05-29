@@ -11,7 +11,7 @@
 <div class="
 	bg-radial  from-gray-900 to-gray-950
 <!--	bg-gray-950-->
-	h-full min-h-screen
+	min-h-screen h-full
 "
      style="background-position: 0% -20%;
 background-size: 100% 150%"
@@ -22,4 +22,8 @@ background-size: 100% 150%"
 <style>
     @import "tailwindcss";
 
+	:global(body){
+		@apply
+		bg-gray-950;
+	}
 </style>

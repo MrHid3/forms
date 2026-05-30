@@ -1,5 +1,17 @@
 import { type Actions, redirect } from '@sveltejs/kit';
 import { PUBLIC_BACKEND_URL } from '$env/static/public';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ cookies }) => {
+	const token = cookies.get('token');
+	if (token) {
+		const user = parseJwt(token);
+		if (user && user.exp * 1000 > Date.now()) {
+			throw redirect(301, '/dashboard');
+		}
+	}
+
+};
 
 export const actions: Actions = {
 	register: async ({ request }) => {
@@ -51,7 +63,7 @@ export const actions: Actions = {
 		}
 
 		if(doRedirect){
-			redirect(303, "/dashboard")
+			redirect(303, data.get("after")?.toString() ?? "/dashboard")
 		}
 
 		return {
@@ -60,3 +72,13 @@ export const actions: Actions = {
 		}
 	}
 };
+
+function parseJwt(token: string) {
+	try {
+		const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+		return JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
+	} catch {
+		return null;
+	}
+}
+

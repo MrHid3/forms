@@ -1,6 +1,7 @@
 <script lang="ts">
     import {enhance} from '$app/forms';
     import {untrack} from "svelte";
+    import { resolve } from '$app/paths';
 
     interface Form {
         id: number
@@ -63,7 +64,7 @@ flex flex-col justify-center
     grid grid-cols-4 gap-4 p-10
 	">
         {#each forms as form (form.id)}
-            <a href={`/form/${form.id}`} class="
+            <a href={resolve(`/form/${form.id}`)} class="
 					h-full min-h-20 w-full
 					border-2 border-gray-400 hover:border-gray-200
 					rounded-xl

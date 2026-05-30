@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance} from '$app/forms';
+		import { browser } from '$app/environment';
 
 	let { form } = $props();
 
@@ -144,6 +145,9 @@
                         rounded-sm
                         " id="show-password2" type="checkbox">
 					</label>
+				  {#if browser && (new URLSearchParams(window.location.search)).get("after")}
+					<input type="hidden" name="after" value={(new URLSearchParams(window.location.search)).get("after")}>
+					{/if}
 					<button class="button p-1" type="submit">LOGIN</button>
 					{#if form?.type == "login"}
 						<p class="

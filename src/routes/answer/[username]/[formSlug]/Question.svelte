@@ -17,6 +17,17 @@
     const { question } : {question: Question} = $props();
     let rangeValue = $state(question.answers?.min ? (question.answers?.min + question.answers.max)/2 - ((question.answers.min + question.answers.max) % question.answers.step) : 0)
 
+    function enforceCheckboxRequired(e: Event) {
+        const form = (e.target as HTMLElement).closest('form');
+        if (!form) return;
+        if (question.type === "multiple choice" && question.required) {
+            const boxes = form.querySelectorAll<HTMLInputElement>(
+              `input[type="checkbox"][name="${question.id}"]`
+            );
+            const anyChecked = Array.from(boxes).some(b => b.checked);
+            boxes.forEach(b => b.setCustomValidity(anyChecked ? "" : "Please select at least one option."));
+        }
+    }
 </script>
 
 <div class="text-2xl text-gray-200 p-4 flex flex-col">
@@ -24,16 +35,16 @@
     {#if question.type === "short answer" }
         <input type="text" name={question.id.toString()} maxlength="20" required={question.required}/>
     {:else if question.type === "long answer"}
-        <textarea name={question.id.toString()} cols="30" rows="10"></textarea>
+        <textarea name={question.id.toString()} cols="30" rows="10" required={question.required}></textarea>
     {:else if question.type === "single choice" || question.type === "multiple choice"}
         {@const  inputType= question.type === "single choice" ? "radio" :"checkbox" }
         <div class="flex flex-col gap-2">
             {#each question.answers as answer (answer.id)}
                 <div class="flex flex-row w-full justify-between">
-                    <label for="choice-{question.id}-{answer.id}"
+                    <label for={`choice-${question.id}-${answer.id}`}
                            class="flex flex-row wrap-normal border-2 border-gray-500 choice-label items-center gap-3 p-1 rounded-xl text-gray-300">
                         <input type={inputType}
-                               value={answer.id} id="choice-{question.id}-{answer.id}" name={question.id.toString()}>
+                               value={answer.id} id={`choice-${question.id}-${answer.id}`} name={question.id.toString()} required={question.required && inputType == "radio"} onchange={enforceCheckboxRequired}/>
                         <span class="text-gray-300">{answer.content}</span>
                     </label>
                 </div>

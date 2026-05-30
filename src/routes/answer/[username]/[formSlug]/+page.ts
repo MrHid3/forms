@@ -1,4 +1,4 @@
-import type {PageLoad} from "../../../../.svelte-kit/types/src/routes/dashboard/$types";
+import type {PageLoad} from "../../../../../.svelte-kit/types/src/routes/dashboard/$types";
 import {PUBLIC_BACKEND_URL} from "$env/static/public";
 
 export const load : PageLoad = async (event) => {
@@ -7,9 +7,11 @@ export const load : PageLoad = async (event) => {
     // console.log(formRequest);
     let form = await formRequest.json();
 
-    if(formRequest.ok){
+    // if(formRequest.ok){
         return {
-            form: form.form
+						error: form.status == "error" ? form.message : null,
+            form: form.form,
+						url: `${event.params.username}/${event.params.formSlug}`
         }
-    }
+    // }
 }

@@ -6,6 +6,10 @@ const UNPROTECTED_ROUTES = [
 	'/answer/'
 ];
 
+const UNPROTECTED_EXACTLY = [
+	'/'
+]
+
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('token');
 
@@ -18,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	const isUnprotected = UNPROTECTED_ROUTES.some((r) => event.url.pathname.startsWith(r));
+	const isUnprotected = UNPROTECTED_ROUTES.some((r) => event.url.pathname.startsWith(r)) || UNPROTECTED_EXACTLY.some((r) => event.url.pathname == r);
 	if (!isUnprotected && !activeToken) {
 		redirect(302, '/auth');
 	}

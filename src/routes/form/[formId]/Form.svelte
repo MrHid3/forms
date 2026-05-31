@@ -2,10 +2,9 @@
 	import { enhance } from '$app/forms';
 	import Question from './Question.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import { untrack } from 'svelte';
+		import { tick, untrack } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import { resolve } from '$app/paths';
 
 	interface rangeSettings {
 		min: number,
@@ -35,7 +34,7 @@
 		questions: Question[],
 	}
 
-	let {form}  : {form: Form} = $props()
+	let { form }: { form: Form } = $props();
 
 	let loadedForm = $state(form as Form);
 
@@ -44,7 +43,7 @@
 		untrack(() => {
 			loadedForm = form;
 			saveForm();
-		})
+		});
 	});
 
 	let oldForm: Form;
@@ -157,15 +156,18 @@
 		console.log('form saved');
 	};
 
-	const addQuestion = () => {
+	const addQuestion = async () => {
 		loadedForm.questions.push({
-			id: -loadedForm.questions.length - 1,
+			id: - Math.random() * 103819083498,
 			type: 'single choice',
 			order: loadedForm.questions.length,
 			required: false,
 			content: `Question ${loadedForm.questions.length + 1}`,
 			answers: [{ id: 0, content: 'Option 1' }]
 		} as Question);
+		await tick();
+		const container = document.getElementById('container');
+		container.parentElement.scrollTo(0, container.parentElement.scrollHeight);
 	};
 
 	const removeQuestion = (id: number) => {
@@ -198,58 +200,60 @@
 	$effect(() => {
 		JSON.stringify(loadedForm);
 		untrack(() => {
-			if(loadedForm.isPublished) return;
+			if (loadedForm.isPublished) return;
 			restartTimer();
 		});
 	});
 </script>
 
-<!--TODO: disable edits if poll published-->
-<a class="button p-1 absolute top-4 left-4" href={resolve("/dashboard")}>&#9664; DASHBOARD</a>
-<button class="button p-1 absolute top-4 right-4" onclick={() => saveChanges()}>save</button>
-<input bind:value={autoSaveIntervalSeconds} class="p-1 absolute top-14 right-4 text-gray-300" type="number">
-<label class="absolute text-gray-300 p-1 top-24 right-4" for="shuffleQuestions">
+<div id="container">
+  <label class="absolute text-gray-300 p-1 top-24 right-4" for="shuffleQuestions">
 	Shuffle questions
-	<input bind:checked={loadedForm.shuffleQuestions} class="text-blue-500" id="shuffleQuestions" type="checkbox">
-</label>
-<label class="absolute text-gray-300 p-1 top-34 right-4" for="requireLogin">
+	<input bind:checked={loadedForm.shuffleQuestions} class="text-blue-500" disabled={loadedForm.isPublished}
+	       id="shuffleQuestions"
+	       type="checkbox">
+  </label>
+  <label class="absolute text-gray-300 p-1 top-34 right-4" for="requireLogin">
 	Require login
-	<input bind:checked={loadedForm.requireLogin} class="text-blue-500" id="requireLogin" type="checkbox">
-</label>
-<form action="?/delete" method="post" use:enhance>
-	<input name="formId" type="hidden" value={loadedForm.id}>
-<!--	TODO: add warning-->
-	<button class="absolute top-44 right-4 button p-4 text-3xl" type="submit">DELETE</button>
-</form>
-{#if !loadedForm.isPublished}
-	<form action="?/publish" method="post" use:enhance>
-		<input type="hidden" value={loadedForm.id} name="formId">
-<!--		TODO: add warning-->
-		<button type="submit" class="absolute top-64 right-4 button p-4 text-3xl">PUBLISZ</button>
+	<input bind:checked={loadedForm.requireLogin} class="text-blue-500" disabled={loadedForm.isPublished}
+	       id="requireLogin"
+	       type="checkbox">
+  </label>
+  {#if !loadedForm.isPublished}
+	<input bind:value={autoSaveIntervalSeconds} class="p-1 absolute top-14 right-4 text-gray-300" type="number">
+	<form action="?/delete" method="post" use:enhance>
+	  <input name="formId" type="hidden" value={loadedForm.id}>
+	  <!--	TODO: add warning-->
+	  <button class="absolute top-44 right-4 button p-4 text-3xl" type="submit">DELETE</button>
 	</form>
-{:else}
+	<form action="?/publish" method="post" use:enhance>
+	  <input type="hidden" value={loadedForm.id} name="formId">
+	  <!--		TODO: add warning-->
+	  <button type="submit" class="absolute top-64 right-4 button p-4 text-3xl">PUBLISZ</button>
+	</form>
+  {:else}
 	<span class="text-gray-300 absolute right-4 top-64">Form published</span>
-{/if}
+  {/if}
+<div class="flex flex-col">
+  <input autocomplete="off" bind:value={loadedForm.title} class="input-stealth mx-auto text-2xl"
+         disabled={loadedForm.isPublished}
+         placeholder="title">
+  <div class="bg-gray-400 w-3/4 mx-auto h-px"></div>
+  <input autocomplete="off" bind:value={loadedForm.description} class="input-stealth mx-auto"
+         disabled={loadedForm.isPublished}
+         placeholder="description">
+  <input autocomplete="off" bind:value={loadedForm.slug} class="input-stealth mx-auto" disabled={loadedForm.isPublished}
+         placeholder="slug">
 
-<div class="
-w-full h-full
-bg-linear-to-b from-gray-900 to-gray-800 from-20% to-100%
-mx-auto
-px-5 py-4 rounded-b-xl
-relative
-flex flex-col gap-4
-">
-	<input autocomplete="off" bind:value={loadedForm.title} class="input-stealth mx-auto text-2xl" placeholder="title">
-	<div class="bg-gray-400 w-3/4 mx-auto h-px"></div>
-	<input autocomplete="off" bind:value={loadedForm.description} class="input-stealth mx-auto" placeholder="description">
-	<input autocomplete="off" bind:value={loadedForm.slug} class="input-stealth mx-auto" placeholder="slug">
-	{#each loadedForm.questions as question, index (question.id)}
-		<Question bind:question={loadedForm.questions[index]}
-		          deleteMe={() => removeQuestion(loadedForm.questions[index].id)}
-		          published={loadedForm.isPublished}></Question>
-	{/each}
+</div>
+  {#each loadedForm.questions as question, index (question.id)}
+	<Question bind:question={loadedForm.questions[index]}
+	          deleteMe={() => removeQuestion(loadedForm.questions[index].id)}
+	          published={loadedForm.isPublished}></Question>
+  {/each}
+  {#if !loadedForm.isPublished}
 	<button class="button h-15 w-1/4 self-center text-3xl py-2" onclick={() => addQuestion()}>+</button>
-
+  {/if}
 </div>
 
 <style>

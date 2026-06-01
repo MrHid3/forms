@@ -29,6 +29,7 @@ background-size: 100% 150%"
 </div>
 
 <style>
+    @import "tailwindcss";
 
     :global(body) {
         @apply

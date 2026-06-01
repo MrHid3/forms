@@ -8,14 +8,14 @@
 
 
 <div class="
-    flex flex-col justify-center items-center gap-5
+    flex flex-col justify-center items-center
     h-2/3 w-screen
     ">
     <a class="button absolute top-4 left-4 p-2 text-xl" href={resolve("/dashboard")}>DASHBOARD</a>
     <div class="container
     bg-linear-to-b from-gray-900 to-gray-800 from-20% to-100%
     h-screen w-2/3
-    rounded-md
+    rounded-b-md
     relative
     overflow-hidden
         ">
@@ -78,7 +78,7 @@
             </div>
 
             <div class="login
-            w-100 px-7 flex-1 overflow-scroll pb-20
+            w-100 flex-1 overflow-scroll pb-20 flex flex-col gap-10
             ">
                 {#if !data.results}
                     <p class="text-neutral-400 text-center">The form isn't published yet!</p>
@@ -103,6 +103,7 @@
         text-4xl text-gray-300 text-center
         w-full
         p-4
+        cursor-pointer
         ;
     }
 

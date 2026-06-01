@@ -24,7 +24,7 @@
 </script>
 <div class="
 w-3/5 h-full
-bg-linear-to-b from-gray-900 to-gray-800 from-20% to-100%
+bg-linear-to-b from-gray-900 to-gray-700 from-20% to-100%
 mx-auto
 px-4
 flex flex-col justify-center

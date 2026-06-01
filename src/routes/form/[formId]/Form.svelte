@@ -102,7 +102,13 @@
     const saveChanges = async () => {
         const diff = findDiff(oldForm, loadedForm);
 
+        if(!(diff.title || diff.description || diff.slug || diff.shuffleQuestiosn || diff.requireLogin || diff.questions.length != 0))
+            return;
         if (diff.title || diff.description || diff.slug || diff.shuffleQuestions || diff.requireLogin) {
+            if(diff.title?.length < 1 || diff.slug?.length < 2 ) {
+                console.log("a")
+                return;
+            }
             await fetch(`${PUBLIC_BACKEND_URL}/form/${loadedForm.id}`, {
                 method: 'PUT',
                 credentials: 'include',
@@ -186,6 +192,12 @@
     $effect(() => {
         autoSaveIntervalSeconds;
         untrack(() => {
+            if (autoSaveIntervalSeconds < 1 && Number.isNaN(autoSaveIntervalSeconds)){
+                autoSaveIntervalSeconds = 1;
+            }
+            if (autoSaveIntervalSeconds > 10) {
+                autoSaveIntervalSeconds = 10;
+            }
             if (browser)
                 localStorage.setItem('autoSaveIntervalSeconds', (autoSaveIntervalSeconds ?? '0').toString());
         });
@@ -227,33 +239,44 @@
             </label>
         </div>
         {#if !loadedForm.isPublished}
-            <input bind:value={autoSaveIntervalSeconds} class="p-1 top-14 right-4 text-gray-300" type="number">
-            <form action="?/delete" method="post" use:enhance>
-                <input name="formId" type="hidden" value={loadedForm.id}>
-                <!--	TODO: add warning-->
-                <button class="button p-4 text-3xl" type="submit">DELETE</button>
-            </form>
+            <div class="flex text-gray-400 items-center">
+                <span class="p-2">Autosave interval:</span>
+                <input bind:value={autoSaveIntervalSeconds} class="w-6 h-fit block p-2 ring-0 focus:ring-0 border-0 border-b-2 border-b-gray-300 focus:border-b-white focus:text-gray-300 duration-100" style="transition: border, color" type="number">
+            </div>
             <form action="?/publish" method="post" use:enhance>
                 <input type="hidden" value={loadedForm.id} name="formId">
                 <!--		TODO: add warning-->
                 <button type="submit" class="button p-4 text-3xl">PUBLISZ</button>
             </form>
         {:else}
-            <span class="text-gray-300 right-4 top-64">Form published</span>
+            <span class="text-gray-300 right-4 top-64 align-middle self-center">Form published</span>
         {/if}
+        <form action="?/delete" method="post" use:enhance>
+            <input name="formId" type="hidden" value={loadedForm.id}>
+            <!--	TODO: add warning-->
+            <button class="button p-4 text-3xl" type="submit">DELETE</button>
+        </form>
 
     </div>
-    <div class="flex flex-col">
-        <input autocomplete="off" bind:value={loadedForm.title} class="input-stealth mx-auto text-2xl"
+    <div class="flex flex-col items-center">
+        <span class="input-steal-container">
+        <input autocomplete="off" bind:value={loadedForm.title} class="input-stealth mx-auto text-2xl text-center"
                disabled={loadedForm.isPublished}
                placeholder="title">
+        </span>
         <div class="bg-gray-400 w-3/4 mx-auto h-px"></div>
-        <input autocomplete="off" bind:value={loadedForm.description} class="input-stealth mx-auto"
-               disabled={loadedForm.isPublished}
-               placeholder="description">
-        <input autocomplete="off" bind:value={loadedForm.slug} class="input-stealth mx-auto"
-               disabled={loadedForm.isPublished}
-               placeholder="slug">
+        <div class="input-steal-container w-2/3!">
+            <textarea autocomplete="off" bind:value={loadedForm.description} class="input-stealth w-full!"
+                   disabled={loadedForm.isPublished}
+                   placeholder="description"></textarea>
+        </div>
+        <div class="flex text-gray-400 text-center items-center">
+            <span><span class="text-gray-200 select-none">Link:</span> localhost:5173/answer/{loadedForm.owner}/</span>
+            <input autocomplete="off" bind:value={loadedForm.slug} class="input-stealth p-0!" size={loadedForm.slug.length == 0 ? 4 : loadedForm.slug.length}
+                   disabled={loadedForm.isPublished}
+                   placeholder="slug">
+            <button class="button p-1" onclick={(event) => {navigator.clipboard.writeText(`localhost:5173/answer/${loadedForm.owner}/${loadedForm.slug}`)}}>Copy</button>
+        </div>
 
     </div>
     {#each loadedForm.questions as question, index (question.id)}
@@ -262,7 +285,7 @@
                   published={loadedForm.isPublished}></Question>
     {/each}
     {#if !loadedForm.isPublished}
-        <button class="button h-15 w-1/4 self-center text-3xl py-2" onclick={() => addQuestion()}>+</button>
+        <button class="button h-15 w-1/4 block mx-auto mt-10 text-3xl py-2" onclick={() => addQuestion()}>+</button>
     {/if}
 </div>
 
@@ -291,7 +314,6 @@
         @apply
         text-gray-300 text-2xl
         rounded-full
-        accent-red-300
         ;
     }
 
@@ -305,14 +327,28 @@
     .input-stealth {
         @apply
         w-fit
-        text-gray-300  text-center focus:text-gray-100
-        border-0 border-b-2  border-b-transparent focus:border-gray-600
         duration-200
         focus:ring-0 ring-0 active:ring-0
+            border-0
         box-border
-        bg-neutral-700/20 focus:bg-neutral-700/40
+        text-neutral-400 hover:text-neutral-200 focus:text-neutral-200
         ;
         transition-property: border-color, color, padding, background-color;
+    }
+
+    .input-steal-container {
+        @apply
+        w-fit h-fit
+        relative
+        overflow-hidden
+        before:bg-linear-to-t before:from-slate-400 before:to-black/20 before:to-70%
+        before:h-[400%] before:w-full
+        before:absolute before:-top-1/4 before:left-0
+        not-has-[input:disabled]:hover:before:-top-3/4 has-focus-within:before:-top-3/4
+        before:duration-200
+        rounded-xl
+        m-5
+        ;
     }
 
     .switch {
@@ -338,5 +374,13 @@
 
     *:before {
         z-index: -1;
+    }
+
+    input[type='number']::-webkit-outer-spin-button,
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number'] {
+        -webkit-appearance: none;
+        margin: 0;
+        -moz-appearance: textfield !important;
     }
 </style>

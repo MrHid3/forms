@@ -18,6 +18,7 @@
 	<div class="container
     bg-linear-to-b from-gray-900 to-gray-800 from-20% to-100%
     h-100 w-100
+    mt-100
     rounded-md
     relative
     overflow-hidden

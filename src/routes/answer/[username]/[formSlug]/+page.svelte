@@ -2,7 +2,7 @@
 	import Question from './Question.svelte';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-		import { untrack } from 'svelte';
+	import { untrack } from 'svelte';
 
 	interface rangeSettings {
 		min: number,
@@ -49,61 +49,65 @@
 		form?.success;
 		untrack(() => {
 			submitted = form?.success;
-
 		});
 	});
 </script>
 
 {#if submitted}
-  <p class="text-gray-300 mx-auto text-center text-2xl">Your answers have been submitted!</p>
-  {#if !loadedForm?.requireLogin}
-	<button class="text-blue-500 w-fit block mx-auto text-center text-xl cursor-pointer"
-	        onclick={() => submitted = false}>Answer the questions again
-	</button>
-  {/if}
+	<p class="text-gray-300 mx-auto text-center text-2xl">Your answers have been submitted!</p>
+	{#if !loadedForm?.requireLogin}
+		<button class="text-blue-500 w-fit block mx-auto text-center text-xl cursor-pointer"
+		        onclick={() => submitted = false}>Answer the questions again
+		</button>
+	{/if}
 {:else}
-  {#if data.error == "No token provided"}
-	<p class="text-gray-300 text-4xl">Login is required for this form</p>
-	<a href={resolve(`/auth?after=${encodeURI(`answer/${data.url}`)}`)} class="text-blue-400">Go to login</a>
-  {:else if data.error}
-	<p class="text-gray-300 text-4xl">{data.error}</p>
-	<a href={resolve(`/auth?after=${encodeURI(`answer/${data.url}`)}`)} class="text-blue-400">Go to dashboard</a>
-  {:else}
-	<form action="?/send" class="w-3/4 mx-auto bg-gray-700 h-min-full h-full" method="POST" use:enhance>
-	  <input type="hidden" name="formId" value={loadedForm?.id}>
-	  <p>{loadedForm?.title}</p>
-	  <p>{loadedForm?.description}</p>
-	  {#each shuffle(loadedForm?.questions) as question, index (question)}
-		<Question question={question}></Question>
-	  {/each}
-	  <button class="button text-8xl w-3/4" type="submit">Submit</button>
-	</form>
-  {/if}
+	{#if data.error == "No token provided"}
+		<p class="text-gray-300 text-4xl">Login is required for this form</p>
+		<a href={resolve(`/auth?after=${encodeURI(`answer/${data.url}`)}`)} class="text-blue-400">Go to login</a>
+	{:else if data.error}
+		<p class="text-gray-300 text-4xl">{data.error}</p>
+		<a href={resolve(`/auth?after=${encodeURI(`answer/${data.url}`)}`)} class="text-blue-400">Go to dashboard</a>
+	{:else}
+		<form action="?/send"
+		      class="w-3/4 mx-auto bg-linear-to-b from-gray-900 to-gray-800 from-20% to-100%h-min-full h-full flex flex-col pb-4 rounded-b-md"
+		      method="POST" use:enhance>
+			<input type="hidden" name="formId" value={loadedForm?.id}>
+			<div class="sticky top-0 left-0 bg-gray-900 border-b-2 border-b-slate-500 p-4">
+				<p class="text-8xl ml-20 mb-4 text-gray-200">{loadedForm?.title}</p>
+				<p class="text-2xl ml-20 w-max-3/4 text-gray-400">{loadedForm?.description}</p>
+			</div>
+			{#each loadedForm.shuffleQuestions ?  shuffle(loadedForm?.questions) : loadedForm?.questions as question, index (question)}
+				<Question question={question}></Question>
+			{/each}
+			<button class="button text-5xl w-fit p-4 self-center" type="submit">Submit</button>
+			<div class="text-sm text-neutral-400 ml-5">Pytania z * są obowiązkowe</div>
+		</form>
+	{/if}
 {/if}
 
 <style>
     @import "tailwindcss";
 
-	.button {
-		@apply
-		text-neutral-300 hover:text-gray-200 font-bold text-center
-		border-2 border-gray-400 hover:border-gray-300 rounded-lg
-		z-50
-		relative
-		overflow-hidden
-		cursor-pointer
-		before:bg-linear-to-r before:from-gray-900  before:via-slate-500 before:to-gray-900 before:from-20% before:to-80%
-		before:h-[200%] before:w-[200%]
-		before:absolute before:-left-full
-		hover:before:-left-0
-		before:-top-3
-		before:duration-500 before:ease-out
-		text-shadow-md text-shadow-black/40
-		;
-	}
+    .button {
+        @apply
+        text-neutral-300 hover:text-gray-200 font-bold text-center
+        border-2 border-gray-400 hover:border-gray-300 rounded-lg
+        z-50
+        relative
+        overflow-hidden
+        cursor-pointer
+        before:bg-linear-to-r before:from-gray-900  before:via-slate-500 before:to-gray-900 before:from-20% before:to-80%
+        before:h-[200%] before:w-[200%]
+        before:absolute before:-left-full
+        hover:before:-left-0
+        before:-top-3
+        before:duration-500 before:ease-out
+        text-shadow-md text-shadow-black/40
+        ;
+    }
 
-	*:before{
-		z-index: -1
-	}
+    *:before {
+        z-index: -1
+    }
 
 </style>

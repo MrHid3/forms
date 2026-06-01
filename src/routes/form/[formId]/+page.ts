@@ -5,17 +5,20 @@ export const load: PageLoad = async (event) => {
 	let formRequest = await event.fetch(`${PUBLIC_BACKEND_URL}/form/${event.params.formId}`, {
 		credentials: 'include'
 	});
-	let answersRequest = await event.fetch(
-		`${PUBLIC_BACKEND_URL}/form/${event.params.formId}/summary`,
-		{ credentials: 'include' }
-	);
 	let form = await formRequest.json();
-	let results = await answersRequest.json();
+	let results;
+	if(form.form.isPublished){
+		const answersRequest = await event.fetch(
+			`${PUBLIC_BACKEND_URL}/form/${event.params.formId}/summary`,
+			{ credentials: 'include' }
+		);
+		results = await answersRequest.json();
+	}
 
 	if (formRequest.ok) {
 		return {
 			form: form.form,
-			results: results.answers
+			results: results?.answers
 		};
 	}
 };

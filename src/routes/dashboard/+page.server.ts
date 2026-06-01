@@ -24,7 +24,8 @@ export const actions: Actions = {
         });
 
         return {
-            success: true
+            success: res.ok,
+            error: (await res.json())
         }
     }
 }

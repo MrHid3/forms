@@ -84,15 +84,26 @@
 <style>
     @import "tailwindcss";
 
-    .button {
-        @apply
-        text-gray-200 font-bold text-center hover:text-gray-900
-        border-2 border-gray-200 hover:border-transparent
-        rounded-sm
-        cursor-pointer
-        duration-300
-        hover:bg-gray-50
-        ;
-    }
+	.button {
+		@apply
+		text-neutral-300 hover:text-gray-200 font-bold text-center
+		border-2 border-gray-400 hover:border-gray-300 rounded-lg
+		z-50
+		relative
+		overflow-hidden
+		cursor-pointer
+		before:bg-linear-to-r before:from-gray-900  before:via-slate-500 before:to-gray-900 before:from-20% before:to-80%
+		before:h-[200%] before:w-[200%]
+		before:absolute before:-left-full
+		hover:before:-left-0
+		before:-top-3
+		before:duration-500 before:ease-out
+		text-shadow-md text-shadow-black/40
+		;
+	}
+
+	*:before{
+		z-index: -1
+	}
 
 </style>

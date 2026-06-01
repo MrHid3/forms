@@ -1,8 +1,9 @@
 <script lang="ts">
-	import Form from './Form.svelte';
-	import Result from './Result.svelte';
+    import Form from './Form.svelte';
+    import Result from './Result.svelte';
+    import {resolve} from "$app/paths";
 
-	const { data, form } = $props();
+    const {data, form} = $props();
 </script>
 
 
@@ -10,15 +11,16 @@
     flex flex-col justify-center items-center gap-5
     h-2/3 w-screen
     ">
-  <div class="container
+    <a class="button absolute top-4 left-4 p-2 text-xl" href={resolve("/dashboard")}>DASHBOARD</a>
+    <div class="container
     bg-linear-to-b from-gray-900 to-gray-800 from-20% to-100%
     h-screen w-2/3
     rounded-md
     relative
     overflow-hidden
         ">
-	<!--        login/registration menu-->
-	<div class="
+        <!--        login/registration menu-->
+        <div class="
         h-fit
         flex flex-row justify-evenly
         rounded-t-md
@@ -34,26 +36,26 @@
         before:-top-3
         before:duration-500 before:ease-out
         ">
-	  <input checked class="hidden peer/register" id="register" name="choose-auth" type="radio">
-	  <label class="menu-button
+            <input checked class="hidden peer/register" id="register" name="choose-auth" type="radio">
+            <label class="menu-button
             not-peer-checked/register:hover:text-gray-50
             rounded-tl-md
             not-peer-checked/register:text-gray-300
             " for="register">
-		Form
-	  </label>
+                Form
+            </label>
 
-	  <input class="hidden peer/login" id="login" name="choose-auth" type="radio">
-	  <label class="menu-button
+            <input class="hidden peer/login" id="login" name="choose-auth" type="radio">
+            <label class="menu-button
             rounded-tr-md
             not-peer-checked/login:text-gray-300
              not-peer-checked/login:hover:text-gray-50
             " for="login">
-		Results
-	  </label>
-	</div>
-	<!--        actual forms-->
-	<div class="form-container
+                Results
+            </label>
+        </div>
+        <!--        actual forms-->
+        <div class="form-container
         flex flex-row justify-evenly
         h-full w-[200%]
         duration-200
@@ -69,21 +71,24 @@
         after:h-0.5
         after:absolute after:right-0 after:top-0
         ">
-	  <div class="register
+            <div class="register
                     h-full relative flex-1 overflow-scroll pb-20
                     ">
-		<Form form={data.form}></Form>
-	  </div>
+                <Form form={data.form}></Form>
+            </div>
 
-	  <div class="login
+            <div class="login
             w-100 px-7 flex-1 overflow-scroll pb-20
             ">
-		  {#each data.results as answer (answer.question.id)}
-			<Result result={answer}></Result>
-		  {/each}
-	  </div>
-	</div>
-  </div>
+                {#if !data.results}
+                    <p class="text-neutral-400 text-center">The form isn't published yet!</p>
+                {/if}
+                {#each data.results as answer (answer.question.id)}
+                    <Result result={answer}></Result>
+                {/each}
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -107,12 +112,38 @@
 
     .button {
         @apply
-        text-gray-200 font-bold text-center hover:text-gray-900
-        border-2 border-gray-200 hover:border-transparent
-        rounded-sm
+        text-neutral-300 hover:text-gray-200 font-bold text-center
+        border-2 border-gray-400 hover:border-gray-300 rounded-lg
+        z-50
+        /*relative*/
+        overflow-hidden
         cursor-pointer
-        duration-300
-        hover:bg-gray-50
+        before:bg-linear-to-r before:from-gray-900  before:via-slate-500 before:to-gray-900 before:from-20% before:to-80%
+        before:h-[200%] before:w-[200%]
+        before:absolute before:-left-full
+        hover:before:-left-0
+        before:-top-3
+        before:duration-500 before:ease-out
+        text-shadow-md text-shadow-black/40
+        ;
+    }
+    .switch {
+        @apply
+        w-12 h-6
+        relative
+        rounded-xl
+        focus:ring-2
+        ring-slate-400
+        outline-0
+        border-2 border-black/20
+        overflow-hidden
+        cursor-pointer
+        before:bg-linear-to-r before:from-gray-900 before:via-slate-500 before:to-gray-900 via-30%
+        before:absolute before:-left-4/5 before:top-0 before:h-full before:w-[200%]
+        has-checked:before:-left-1/5
+        before:duration-150
+        before:ease-in-out
+        after:rounded-full after:h-full after:w-1/2 after:absolute after:left-0 after:bg-white/40 has-checked:after:left-1/2 after:duration-200 has-checked:after:bg-white/70
         ;
     }
 </style>
